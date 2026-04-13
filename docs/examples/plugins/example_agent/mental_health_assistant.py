@@ -2,6 +2,8 @@ import asyncio
 import logging
  
 from mellea.stdlib.context import ChatContext
+from mellea.core import CBlock
+
 
 from mellea.stdlib.frameworks.react import react
 from mellea.stdlib.session import start_session
@@ -56,10 +58,8 @@ GOALS = [
 ]
  
  
-async def run_goal(goal: str, username: str = "demo_user") -> None:
-    log.info("=" * 60)
-    log.info("GOAL: %s", goal)
-    log.info("=" * 60)
+async def run_goal(goals: list[str], username: str = "demo_user") -> None:
+   
  
     # agent_plugins includes:
     #   - detect_self_harm     (COMPONENT_PRE_EXECUTE, priority 1)
@@ -67,27 +67,44 @@ async def run_goal(goal: str, username: str = "demo_user") -> None:
     #   - enforce_tool_allowlist (TOOL_PRE_INVOKE)
     #   - redact_pii           (TOOL_POST_INVOKE)
     #   - audit_tool_calls     (TOOL_POST_INVOKE, fire-and-forget)
+
     with start_session(model_id="llama3.1", ctx=ChatContext(),plugins=[tool_sanitizer, user_input_safety]) as m:
         # Set the active username so detect_self_harm knows who to notify.
-        try:
-            out, _ = await react(
+
+        for goal in goals:
+            log.info("=" * 60)
+            log.info("GOAL: %s", goal)
+            log.info("=" * 60)
+
+            '''
+            Used for testing component_pre_execute hook for self-harm detection. The context view is coming back as "none" in the hook, even after adding a CBlock with the goal to the context. 
+            Unsure if this is an issue with how I'm adding to the context, or if there's some nuance with how context views work that I'm missing. 
+            Will need to investigate further.
+            m.ctx = m.ctx.add(CBlock(f"You are a mental health assistant. Be empathetic and careful. User Goal: {goal}"))
+            print(f"Current context view:{m.ctx}")
+            print("Moving onto react loop...")
+
+            '''
+
+           
+            try:
+                out, _ = await react(
                 goal=goal,
                 context=m.ctx,
                 backend=m.backend,
                 tools=tools,
                 loop_budget=2,
             )
-            log.info("RESPONSE:\n%s", out)
-        except Exception as exc:
+                log.info("RESPONSE:\n%s", out)
+            except Exception as exc:
             # PluginViolationError surfaces here if a hook blocks the request.
-            log.warning("Request blocked or failed: %s", exc)
+                log.warning("Request blocked or failed: %s", exc)
  
-    log.info("")
+            log.info("")
  
  
 async def main() -> None:
-    for goal in GOALS:
-        await run_goal(goal)
+    await run_goal(GOALS)
  
  
 if __name__ == "__main__":

@@ -376,6 +376,30 @@ _SELF_HARM_PATTERNS: list[re.Pattern] = [
         re.compile(r"\b(end(ing)? (my|this) (life|pain))\b", re.IGNORECASE),
         re.compile(r"\b(no (reason|point) (in |to )?(living|going on))\b", re.IGNORECASE),
     ]
+
+@hook(HookType.COMPONENT_PRE_EXECUTE, mode=PluginMode.SEQUENTIAL, priority=1)
+async def detect_self_harm_component_version(payload, ctx):
+    raw_context = payload.context_view
+    print(f"Running self-harm detection on context view: {raw_context}")
+    print(f"Ctx:  {ctx}")
+    context=""
+    '''
+    raw_context is returned as "none" despite adding to context in the mental_health_assistant.py file, and is not contained in ctx 
+    either
+    context_entities=raw_context.view_for_generation()
+    for entity in context_entities:
+        context+=(str(entity))
+    '''
+    if not any(p.search(context) for p in _SELF_HARM_PATTERNS):
+            return None
+    log.warning("[self-harm] Flagged message — triggering obligation pipeline.")
+    _run_notification_obligation("username", payload)
+    return block(
+                f"A self harm message was detected, message sent to trusted providers and parents",
+                code="USER_UNSAFE",
+                details={"message": context },
+    )
+
 @hook(HookType.GENERATION_PRE_CALL, mode=PluginMode.SEQUENTIAL, priority=1)
 async def detect_self_harm(payload, ctx):
     raw_context = payload.context
