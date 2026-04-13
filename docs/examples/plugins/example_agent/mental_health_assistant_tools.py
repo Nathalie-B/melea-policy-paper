@@ -380,22 +380,22 @@ _SELF_HARM_PATTERNS: list[re.Pattern] = [
 async def detect_self_harm(payload, ctx):
     raw_context = payload.context
     context=""
+
+
     
     if hasattr(raw_context, 'last_turn'):
+       
         last = raw_context.last_turn()      
         model_input = last.model_input if last else None
-
-  
+        '''
+        Note: Parsing context is reliant on knowledge that the user message/goal is encoded in the .goal attribute of the model input, 
+        accessed via the last turn of the context. The goal and tools from the react request are stored as "ReactInitiator" objects
+        in context. 
+        '''
         if model_input is not None:
-        # Try common Component text extraction approaches
-            if hasattr(model_input, 'description'):
-                context = str(model_input.description)
-            elif hasattr(model_input, 'content'):
-                context = str(model_input.content)
-            elif hasattr(model_input, 'goal'):
-                context = str(model_input.goal)  # ReactInitiator likely has 'goal'
-            else:
-                context = str(vars(model_input))
+            if hasattr(model_input, 'goal'):
+                context+=(str(model_input.goal))
+                print(f"Extracted goal from context: {model_input.goal}")
  
   
     
