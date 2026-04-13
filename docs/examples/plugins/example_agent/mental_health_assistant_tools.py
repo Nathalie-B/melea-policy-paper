@@ -108,7 +108,7 @@ def get_medical_services_link(category: str) -> str:
     )
 
 
-@tool()
+@tool
 def search_web(query: str, max_results: int = 5) -> list[str]:
     """Search the web for information.
 
@@ -280,7 +280,7 @@ def get_therapy_styles(filter_keyword: str = "") -> str:
         for s in styles
     ]
     return "\n\n".join(lines)
- 
+
 
 
 # ---------------------------------------------------------------------------
@@ -376,24 +376,37 @@ _SELF_HARM_PATTERNS: list[re.Pattern] = [
         re.compile(r"\b(end(ing)? (my|this) (life|pain))\b", re.IGNORECASE),
         re.compile(r"\b(no (reason|point) (in |to )?(living|going on))\b", re.IGNORECASE),
     ]
-@hook(HookType.COMPONENT_PRE_EXECUTE, mode=PluginMode.SEQUENTIAL, priority=1)
+@hook(HookType.GENERATION_PRE_CALL, mode=PluginMode.SEQUENTIAL, priority=1)
 async def detect_self_harm(payload, ctx):
-    context_view = payload.context_view or []
-    user_messages = [
-            turn for turn in context_view
-            if getattr(turn, "role", None) == "user"
-        ]
-    if not user_messages:
-            return None
-    latest_message = str(getattr(user_messages[-1], "content", ""))
-    if not any(p.search(latest_message) for p in _SELF_HARM_PATTERNS):
+    raw_context = payload.context
+    context=""
+    
+    if hasattr(raw_context, 'last_turn'):
+        last = raw_context.last_turn()      
+        model_input = last.model_input if last else None
+
+  
+        if model_input is not None:
+        # Try common Component text extraction approaches
+            if hasattr(model_input, 'description'):
+                context = str(model_input.description)
+            elif hasattr(model_input, 'content'):
+                context = str(model_input.content)
+            elif hasattr(model_input, 'goal'):
+                context = str(model_input.goal)  # ReactInitiator likely has 'goal'
+            else:
+                context = str(vars(model_input))
+ 
+  
+    
+    if not any(p.search(context) for p in _SELF_HARM_PATTERNS):
             return None
     log.warning("[self-harm] Flagged message — triggering obligation pipeline.")
-    _run_notification_obligation("username", latest_message)
+    _run_notification_obligation("username", payload)
     return block(
                 f"A self harm message was detected, message sent to trusted providers and parents",
                 code="USER_UNSAFE",
-                details={"message": user_messages },
+                details={"message": context },
             )
 
 # ---------------------------------------------------------------------------

@@ -2,8 +2,10 @@ import asyncio
 import logging
  
 from mellea.stdlib.context import ChatContext
+
 from mellea.stdlib.frameworks.react import react
 from mellea.stdlib.session import start_session
+
 from mental_health_assistant_tools import (
     get_medical_services_link,
     get_therapy_styles,
@@ -31,6 +33,7 @@ tools = [
     get_medical_services_link,
     get_therapy_styles,
     notify_trusted_provider,
+    
 ]
  
  
@@ -64,19 +67,19 @@ async def run_goal(goal: str, username: str = "demo_user") -> None:
     #   - enforce_tool_allowlist (TOOL_PRE_INVOKE)
     #   - redact_pii           (TOOL_POST_INVOKE)
     #   - audit_tool_calls     (TOOL_POST_INVOKE, fire-and-forget)
-    with start_session(model_id="llama3.1", plugins=[tool_sanitizer, tool_security, user_input_safety]) as m:
+    with start_session(model_id="llama3.1", ctx=ChatContext(),plugins=[tool_sanitizer, user_input_safety]) as m:
         # Set the active username so detect_self_harm knows who to notify.
+       
  
         try:
+            
+
             out, _ = await react(
-                goal=(f"{goal}\n\n"
-        "Instructions: Call a tool ONCE to get what you need, "
-        "then write your final answer immediately. "
-        "Do not call the same tool twice."),
+                goal=goal,
                 context=ChatContext(),
                 backend=m.backend,
                 tools=tools,
-                loop_budget=12,
+                loop_budget=2,
             )
             log.info("RESPONSE:\n%s", out)
         except Exception as exc:
