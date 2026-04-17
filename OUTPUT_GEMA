@@ -1,3 +1,15 @@
+
+⏺ Changes made to mental_health_assistant.py:                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                            
+  1. Changed model from llama3.1 to gemma4 (line 71)                                                                                                                                                                                                                        
+    - llama3.1 (8B) wasn't reliably following tool-calling instructions — it generated text without using tools
+    - gemma4 (larger model) properly calls tools and final_answer                                                                                                                                                                                                           
+  2. Increased loop_budget from 2 to 5 (line 96)                                                                                                                                                                                                                            
+    - 2 iterations wasn't enough for the agent to call a tool AND then call final_answer                                                                                                                                                                                    
+    - 5 gives adequate headroom for multi-step reasoning         
+
+
+
 uv run python mental_health_assistant.py   
 2026-04-17T16:09:52 [INFO] cpex.framework.manager: Plugin manager initialized with 0 plugins
 2026-04-17T16:09:52 [INFO] cpex.framework.registry: Registered plugin: mental_health_assistant_tools.redact_pii_from_tool_output with hooks: ['tool_post_invoke']
