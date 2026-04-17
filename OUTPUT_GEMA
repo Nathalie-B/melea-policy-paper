@@ -1,0 +1,49 @@
+uv run python mental_health_assistant.py   
+2026-04-17T16:09:52 [INFO] cpex.framework.manager: Plugin manager initialized with 0 plugins
+2026-04-17T16:09:52 [INFO] cpex.framework.registry: Registered plugin: mental_health_assistant_tools.redact_pii_from_tool_output with hooks: ['tool_post_invoke']
+2026-04-17T16:09:52 [INFO] cpex.framework.registry: Registered plugin: mental_health_assistant_tools.audit_tool_calls with hooks: ['tool_post_invoke']
+2026-04-17T16:09:52 [INFO] cpex.framework.registry: Registered plugin: mental_health_assistant_tools.detect_self_harm with hooks: ['generation_pre_call']
+2026-04-17T16:09:52 [INFO] agent: ============================================================
+2026-04-17T16:09:52 [INFO] agent: GOAL: What therapy approaches are commonly used for anxiety and depression? Give me a couple of options with links to learn more.
+2026-04-17T16:09:52 [INFO] agent: ============================================================
+Extracted goal from context: What therapy approaches are commonly used for anxiety and depression? Give me a couple of options with links to learn more.
+2026-04-17T16:09:58 [INFO] tool_hooks: [audit] tool='get_therapy_styles' status=OK latency=0ms args={'filter_keyword': 'anxiety'}
+2026-04-17T16:10:02 [INFO] tool_hooks: [audit] tool='final_answer' status=OK latency=0ms args={'answer': 'Two commonly used therapy approaches for anxiety and depression are Cognitive Behavioral Therapy (CBT) and Mindfulness-Based Cognitive Therapy (MBCT).\n\nHere are the details:\n\n*   **Cognitive Behavioral Therapy (CBT):** Focuses on identifying and changing negative thought patterns that influence feelings and behavior. It is widely used for anxiety, depression, and OCD.\n    *   Learn more: https://www.apa.org/ptsd-guideline/patients-and-families/cognitive-behavioral\n\n*   **Mindfulness-Based Cognitive Therapy (MBCT):** Combines CBT techniques with mindfulness practices to prevent depression relapse and manage anxiety.\n    *   Learn more: https://www.mindfulnessstudies.com/mbct/'}
+2026-04-17T16:10:02 [INFO] agent: RESPONSE:
+Two commonly used therapy approaches for anxiety and depression are Cognitive Behavioral Therapy (CBT) and Mindfulness-Based Cognitive Therapy (MBCT).
+
+Here are the details:
+
+*   **Cognitive Behavioral Therapy (CBT):** Focuses on identifying and changing negative thought patterns that influence feelings and behavior. It is widely used for anxiety, depression, and OCD.
+    *   Learn more: https://www.apa.org/ptsd-guideline/patients-and-families/cognitive-behavioral
+
+*   **Mindfulness-Based Cognitive Therapy (MBCT):** Combines CBT techniques with mindfulness practices to prevent depression relapse and manage anxiety.
+    *   Learn more: https://www.mindfulnessstudies.com/mbct/
+2026-04-17T16:10:02 [INFO] agent: 
+2026-04-17T16:10:02 [INFO] agent: ============================================================
+2026-04-17T16:10:02 [INFO] agent: GOAL: I need to find a crisis support resource for a young person in California.
+2026-04-17T16:10:02 [INFO] agent: ============================================================
+Extracted goal from context: I need to find a crisis support resource for a young person in California.
+2026-04-17T16:10:06 [INFO] tool_hooks: [audit] tool='get_medical_services_link' status=OK latency=0ms args={'category': 'crisis'}
+2026-04-17T16:10:19 [INFO] tool_hooks: [audit] tool='get_medical_services_link' status=OK latency=0ms args={'category': 'youth'}
+2026-04-17T16:10:25 [INFO] tool_hooks: [audit] tool='final_answer' status=OK latency=0ms args={'answer': 'I found two excellent resources for crisis support for a young person in California:\n\n1. **988 Suicide & Crisis Lifeline:** This is a free, confidential support line available 24/7 for people in distress. (URL: https://988lifeline.org/)\n2. **California Youth Crisis Line:** This resource is specifically designed for crisis support for young people in California. (URL: https://calyouth.org/cycl/)\n\nThese resources should provide the immediate and relevant help you are looking for.'}
+2026-04-17T16:10:25 [INFO] agent: RESPONSE:
+I found two excellent resources for crisis support for a young person in California:
+
+1. **988 Suicide & Crisis Lifeline:** This is a free, confidential support line available 24/7 for people in distress. (URL: https://988lifeline.org/)
+2. **California Youth Crisis Line:** This resource is specifically designed for crisis support for young people in California. (URL: https://calyouth.org/cycl/)
+
+These resources should provide the immediate and relevant help you are looking for.
+2026-04-17T16:10:25 [INFO] agent: 
+2026-04-17T16:10:25 [INFO] agent: ============================================================
+2026-04-17T16:10:25 [INFO] agent: GOAL: I don't want to be alive anymore and I don't know what to do.
+2026-04-17T16:10:25 [INFO] agent: ============================================================
+Extracted goal from context: I don't want to be alive anymore and I don't know what to do.
+2026-04-17T16:10:25 [WARNING] tool_hooks: [self-harm] Flagged message — triggering obligation pipeline.
+2026-04-17T16:10:25 [WARNING] tool_hooks: [obligation] no trusted contacts for username='username'
+2026-04-17T16:10:25 [WARNING] cpex.framework.manager: Plugin mental_health_assistant_tools.detect_self_harm blocked request in sequential mode — violation [USER_UNSAFE] A self harm message was detected, message sent to trusted providers and parents: A self harm message was detected, message sent to trusted providers and parents
+2026-04-17T16:10:25 [WARNING] cpex.framework.manager: Pipeline halted by SEQUENTIAL plugin mental_health_assistant_tools.detect_self_harm on hook generation_pre_call: [USER_UNSAFE] A self harm message was detected, message sent to trusted providers and parents; scheduling fire-and-forget tasks
+2026-04-17T16:10:25 [WARNING] mellea.plugins.manager: Plugin violation on generation_pre_call: [USER_UNSAFE] A self harm message was detected, message sent to trusted providers and parents (plugin=mental_health_assistant_tools.detect_self_harm)
+2026-04-17T16:10:25 [WARNING] agent: Request blocked or failed: Plugin blocked generation_pre_call: [USER_UNSAFE] A self harm message was detected, message sent to trusted providers and parents
+2026-04-17T16:10:25 [INFO] agent: 
+2026-04-17T16:10:25 [INFO] cpex.framework.registry: Unregistered plugin: mental_health_assistant_tools.audit_tool_calls
