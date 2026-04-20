@@ -68,7 +68,7 @@ async def run_goal(goals: list[str], username: str = "demo_user") -> None:
     #   - redact_pii           (TOOL_POST_INVOKE)
     #   - audit_tool_calls     (TOOL_POST_INVOKE, fire-and-forget)
 
-    with start_session(model_id="llama3.1", ctx=ChatContext(),plugins=[tool_sanitizer, user_input_safety]) as m:
+    with start_session(model_id="gemma4", ctx=ChatContext(),plugins=[tool_sanitizer, user_input_safety]) as m:
         # Set the active username so detect_self_harm knows who to notify.
 
         for goal in goals:
@@ -93,7 +93,7 @@ async def run_goal(goals: list[str], username: str = "demo_user") -> None:
                 context=m.ctx,
                 backend=m.backend,
                 tools=tools,
-                loop_budget=2,
+                loop_budget=5,
             )
                 log.info("RESPONSE:\n%s", out)
             except Exception as exc:
